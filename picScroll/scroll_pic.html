@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+li { list-style:none; margin:0; padding:0;}
+a { text-decoration:none;}
+#container { width:600px; height:400px; overflow:hidden; position:relative; border:3px solid #ccc;}
+#picList { width:4200px; height:400px; z-index:1; position:absolute; }
+#picList img {float:left;}
+#container ul { position:absolute; width:100px; z-index:2; bottom:20px; left:250px; height:10px;}
+#container li { height:10px; float:left; margin-right:5px; border:1px solid #fff; background:#333; border-radius:50%; cursor:pointer; width:10px;}
+#container .on { background:orangered;}
+#container .pointer{ height:40px; width:40px; display:block; background-color: RGBA(0,0,0,.3); color:#fff; position:absolute; z-index:2; top:180px; font-size:36px; text-align:center; line-height:39px; display:none; font-weight:bold;}
+#container a:hover { background-color: RGBA(0,0,0,.7);}
+#container:hover .pointer { display: block;}
+#prev { left:20px;}
+#next { right:20px;}
+</style>
+<script>
+	window.onload=function(){
+		var contain = document.getElementById("container");
+		var picList = document.getElementById("picList");
+		var buttons = document.getElementById('icon').getElementsByTagName('li');
+		var prev = document.getElementById("prev");
+		var next = document.getElementById("next");
+		var timer = null;
+		var index = 1;
+		var animated=false;  //控制动画的执行，如果动画正在执行，则不叠加执行
+		function showButton(){
+			/*for(var i=0;i<buttons.length;i++){
+				buttons[i].className='';
+			}*/
+			for(var i=0;i<buttons.length;i++){
+				if(buttons[i].className=='on'){
+					buttons[i].className='';
+					break;
+				}
+			}
+			buttons[index-1].className='on';
+		}
+
+		//图片左右切换
+		function animate(offset){
+			/*picList.style.left = parseInt(picList.style.left)+offset+'px';
+			if(parseInt(picList.style.left)>-600){
+				picList.style.left=-3000+'px';
+			}
+			if (parseInt(picList.style.left)<-3000) {
+				picList.style.left=-600+'px';
+			};*/
+			animated=true;
+			var newLeft=parseInt(picList.style.left)+offset;
+			var time=300;
+			var inteval=10;
+			var speed=offset/(time/inteval);
+			function go(){
+				if((speed>0 && parseInt(picList.style.left)<newLeft)||(speed<0 && parseInt(picList.style.left)>newLeft)){
+					picList.style.left=parseInt(picList.style.left)+speed+'px';
+					setTimeout(go,inteval);
+				}else{
+					animated=false;
+					picList.style.left=newLeft+'px';
+					/*实现无限滚动，当left值大于-600时回到最后一张；当left值小于-3000时回到第一张*/
+					if(newLeft>-600){
+						picList.style.left=-3000+'px';
+					}
+					if (newLeft<-3000) {
+						picList.style.left=-600+'px';
+					};
+				}
+			}
+			go();
+			
+		}
+
+		//自动播放
+		function play(){
+			timer=setInterval(function(){
+				next.onclick();
+			},3000);
+		}
+
+		//停止播放
+		function stop(){
+			clearInterval(timer);
+		}
+		next.onclick=function(){
+			if(!animated){
+				animate(-600);
+			}
+			if(index==5){
+				index=1;
+			}else{
+				index+=1;  //改变按钮的索引值
+			}
+			showButton();  //改变按钮样式
+		}
+		prev.onclick=function(){
+			if(!animated){
+				animate(600);
+			}
+			if (index==1) {
+				index=5;
+			}else{
+				index-=1;
+			}
+			showButton();
+		}
+
+		//添加按钮事件
+		for(var i=0;i<buttons.length;i++){
+			buttons[i].onclick=function(){
+				if (this.className=='on') {
+					return;
+				};	//如果此时点击的按钮的className已经为on，就不在执行
+				var myIndex=parseInt(this.getAttribute('index'));	//获取点击按钮的index值
+				var offset = (myIndex-index)*(-600);   //计算位移量
+				if(!animated){
+					animate(offset);
+				}   //执行动画
+				index=myIndex;
+				showButton();   //按钮变换样式
+			}
+		}
+		container.onmouseover=stop;
+		container.onmouseout=play;
+		play();
+	}
+</script>
+</head>
+	<div id="container">
+    	<div id="picList" class="picList" style="left:-600px">
+        	<img src="scrollImages/5.jpg" alt="5" />
+            <img src="scrollImages/1.jpg" alt="1" />
+            <img src="scrollImages/2.jpg" alt="2" />
+            <img src="scrollImages/3.jpg" alt="3" />
+            <img src="scrollImages/4.jpg" alt="4" />
+            <img src="scrollImages/5.jpg" alt="5" />
+            <img src="scrollImages/1.jpg" alt="1" />
+        </div>
+        <ul id="icon">
+        	<li index="1" class="on"></li>
+            <li index="2"></li>
+            <li index="3"></li>
+            <li index="4"></li>
+            <li index="5"></li>
+        </ul>
+        <a href="javascript:;" id="prev" class="pointer">&lt;</a>
+        <a href="javascript:;" id="next" class="pointer">&gt;</a>
+    </div>
+<body>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>图片裁剪</title>
+	<style type="text/css">
+		body {background: #333;}
+		#box {position: absolute; height: 300px; width: 400px; top: 100px; left: 200px;}
+		#img1 { position: absolute; top: 0; left: 0;opacity: 0.6; filter:alpha(opacity=60);}
+		#img2 { position: absolute; top: 0; left: 0; clip: rect(0,150px,150px,0);}
+	</style>
+</head>
+<body>
+	<div id="box">
+		<img src="cutImages/cutImages.jpg" id="img1" />
+		<img src="cutImages/cutImages.jpg" id="img2" />
+	</div>
+</body>
+</html>
