@@ -8,12 +8,199 @@
 		#box {position: absolute; height: 300px; width: 400px; top: 100px; left: 200px;}
 		#img1 { position: absolute; top: 0; left: 0;opacity: 0.6; filter:alpha(opacity=60);}
 		#img2 { position: absolute; top: 0; left: 0; clip: rect(0,150px,150px,0);}
+		#iconDiv { position: absolute; height: 150px; width: 150px; top:0; left: 0; border:1px solid #fff;}
+		#iconDiv .common { position: absolute; height: 8px; width: 8px; background: #fff;}
+		.left-up { left: -4px; top: -4px; cursor: nw-resize;}
+		.up { left: 50%; margin-left: -4px; top: -4px; cursor: n-resize;}
+		.right-up { right: -4px; top: -4px; cursor: ne-resize;}
+		.right { right: -4px; top: 50%; margin-top: -4px; cursor: e-resize;}
+		.right-down { right: -4px; bottom: -4px; cursor: se-resize;}
+		.down { left: 50%; margin-left: -4px; bottom: -4px; cursor: s-resize;}
+		.left-down { left: -4px; bottom: -4px; cursor: sw-resize;}
+		.left { left: -4px; top: 50%; margin-top: -4px; cursor: w-resize;}
+		#preview { position: absolute; width: 400px; height: 300px; top: 100px; left:620px;}
+		#img3 { position: absolute; clip: rect(0,150px,150px,0);}
 	</style>
+	<script type="text/javascript">
+	window.onload = function(){
+		document.onselectstart = new Function('event.returnValue=false;');
+		var iconDiv = document.getElementById('iconDiv');
+		var right = document.getElementById('right');
+		var up = document.getElementById('up');
+		var left = document.getElementById("left");
+		var down = document.getElementById("down");
+		var leftUp = document.getElementById("left-up");
+		var rightUp = document.getElementById("right-up");
+		var rightDown = document.getElementById("right-down");
+		var leftDown = document.getElementById("left-down");
+		var whichKey = "";
+		var keyDown = false;  //是否按下
+		//鼠标按下事件
+		right.onmousedown = function(){
+			keyDown = true;
+			whichKey = "right";
+		}
+		up.onmousedown = function(){
+			keyDown = true;
+			whichKey = "up";
+		}
+		left.onmousedown = function(){
+			keyDown = true;
+			whichKey = "left";
+		}
+		down.onmousedown = function(){
+			keyDown = true;
+			whichKey = "down";
+		}
+		leftUp.onmousedown = function(){
+			keyDown = true;
+			whichKey = "left-up";
+		}
+		rightUp.onmousedown = function(){
+			keyDown = true;
+			whichKey = "right-up;"
+		}
+		rightDown.onmousedown = function(){
+			keyDown = true;
+			whichKey = "right-down";
+		}
+		leftDown.onmousedown = function(){
+			keyDown = true;
+			whichKey = "left-down";
+		}
+
+		//鼠标松开事件
+		window.onmouseup = function(){
+			keyDown = false;
+		}
+		//鼠标移到事件
+		window.onmousemove = function(event){
+			var e = event || window.event;  //兼容处理
+			//方法一：用if...else
+			/*if (keyDown) {
+				if (whichKey == "right") {
+					rightMove(event);
+				}else if (whichKey == "up") {
+					upMove(event);
+				}else if (whichKey == "left") {
+					leftMove(event);
+				}else if (whichKey == "down") {
+					downMove(event);
+				}else if (whichKey == "left-up") {
+					leftMove(event);
+					upMove(event);
+				}else if (whichKey == "right-up") {
+					rightMove(event);
+					upMove(event);
+				}else if (whichKey == "right-down") {
+					rightMove(event);
+					downMove(event);
+				}else if (whichKey == "left-down") {
+					leftMove(event);
+					downMove(event);
+				};
+			};*/
+			//方法二：用switch
+			if (keyDown) {
+				switch(whichKey){
+					case "right":rightMove(event);break;
+					case "up":upMove(event);break;
+					case "left":leftMove(event);break;
+					case "down":downMove(event);break;
+					case "left-up":leftMove(event);upMove(event);break;
+					case "right-up":rightMove(event);upMove(event);break;
+					case "right-downi":rightMove(event);downMove(event);break;
+					case "left-down":leftMove(event);downMove(event);break;
+				}
+				setHightlight();
+				preview();
+			};
+		}
+		//拉动right
+		function rightMove(e){
+			var addWidthRight = "";   //鼠标移动时增加的宽度
+			var x = e.clientX;  //鼠标x坐标
+			var beforeWidth = iconDiv.offsetWidth - 2; //框框宽度
+			addWidthRight = x - beforeWidth - getPosition(iconDiv).left; 
+			iconDiv.style.width = addWidthRight + beforeWidth + 'px';
+		}
+		//拉动up
+		function upMove(e){
+			var addHeightUp = "";   //鼠标移动时增加的高度
+			var y = e.clientY;  //鼠标y坐标
+			var beforeHeight = iconDiv.offsetHeight - 2;  //框框高度
+			addHeightUp = getPosition(iconDiv).top - y;
+			iconDiv.style.height = beforeHeight + addHeightUp + "px";
+			iconDiv.style.top = iconDiv.offsetTop - addHeightUp + "px";
+		}
+		//拉动left
+		function leftMove(e){
+			var addWidthLeft = "";
+			var x = e.clientX;
+			var beforeWidth = iconDiv.offsetWidth - 2;
+			addWidthLeft = getPosition(iconDiv).left - x;
+			iconDiv.style.width = beforeWidth + addWidthLeft + "px";
+			iconDiv.style.left = iconDiv.offsetLeft - addWidthLeft + "px";
+		}
+		function downMove(e){
+			var addHeightDown = "";
+			var y = e.clientY;
+			var beforeHeight = iconDiv.offsetHeight - 2;
+			addHeightDown = y - beforeHeight - getPosition(iconDiv).top;
+			iconDiv.style.height = iconDiv.offsetHeight + addHeightDown + "px";
+		}
+		//获取元素相对于屏幕左边、上边的距离
+		function getPosition(node){
+			var left = node.offsetLeft;
+			var top = node.offsetTop;
+			var parent = node.offsetParent;
+			if (left != null) {
+				left += parent.offsetLeft;
+				top += parent.offsetTop;
+				parent = parent.offsetParent;
+			};
+			return {"left":left,"top":top};
+		}
+		//设置选取框的高亮
+		function setHightlight(){
+			var top = iconDiv.offsetTop;
+			var right = iconDiv.offsetLeft + iconDiv.offsetWidth;
+			var bottom = iconDiv.offsetTop + iconDiv.offsetHeight;
+			var left = iconDiv.offsetLeft;
+			var oImage = document.getElementById("img2");
+			oImage.style.clip = "rect("+top+"px,"+right+"px,"+bottom+"px,"+left+"px)";
+		}
+		//实现预览框
+		function preview(){
+			var top = iconDiv.offsetTop;
+			var right = iconDiv.offsetLeft + iconDiv.offsetWidth;
+			var bottom = iconDiv.offsetTop + iconDiv.offsetHeight;
+			var left = iconDiv.offsetLeft;
+			var oImg = document.getElementById("img3");
+			oImg.style.top = -top + "px";   //使预览框始终在左上角
+			oImg.style.left = -left + "px";
+			oImg.style.clip = "rect("+top+"px,"+right+"px,"+bottom+"px,"+left+"px)";
+		}
+	}
+	</script>
 </head>
 <body>
 	<div id="box">
 		<img src="cutImages/cutImages.jpg" id="img1" />
 		<img src="cutImages/cutImages.jpg" id="img2" />
+		<div id="iconDiv">
+			<span class="common left-up" id="left-up"></span>
+			<span class="common up" id="up"></span>
+			<span class="common right-up" id="right-up"></span>
+			<span class="common right" id="right"></span>
+			<span class="common right-down" id="right-down"></span>
+			<span class="common down" id="down"></span>
+			<span class="common left-down" id="left-down"></span>
+			<span class="common left" id="left"></span>
+		</div>
+	</div>
+	<div id="preview">
+		<img src="cutImages/cutImages.jpg" id="img3" />
 	</div>
 </body>
 </html>
